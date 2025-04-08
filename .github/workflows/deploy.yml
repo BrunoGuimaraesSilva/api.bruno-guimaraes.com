@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+    environment: production
     steps:
       # Checkout the code
       - name: Checkout Repository
@@ -30,8 +31,13 @@ jobs:
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            # Debug info
+            whoami
+            groups
+            ls -l /var/run/docker.sock
+
             # Navigate to the project directory
-            cd ~/email-service
+            cd ~/api.bruno-guimaraes.com
 
             # Pull the latest code
             git pull origin main
