@@ -30,7 +30,11 @@ func main() {
 	handler := interfaces.NewMessageHandler(service)
 
 	c := cors.New(cors.Options{
-		AllowedOrigins:   []string{"https://bruno-guimaraes.com"},
+		AllowedOrigins: []string{
+			"https://bruno-guimaraes.com",
+			"https://main.d3hc4476qkxsht.amplifyapp.com",
+			"https://homolog.bruno-guimaraes.com",
+			"https://homolog.d3hc4476qkxsht.amplifyapp.com"},
 		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
 		AllowedHeaders:   []string{"Authorization", "Content-Type"},
 		AllowCredentials: true,
