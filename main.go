@@ -8,6 +8,7 @@ import (
 	"github.com/BrunoGuimaraesSilva/api.bruno-guimaraes.com/application"
 	"github.com/BrunoGuimaraesSilva/api.bruno-guimaraes.com/infrastructure"
 	"github.com/BrunoGuimaraesSilva/api.bruno-guimaraes.com/interfaces"
+	"github.com/rs/cors" // Add this import
 )
 
 func main() {
@@ -28,7 +29,15 @@ func main() {
 	service := application.NewSendMessageService(emailRepo)
 	handler := interfaces.NewMessageHandler(service)
 
-	http.HandleFunc("/api/send-message", interfaces.AuthMiddleware(authToken, handler.SendMessage))
+	c := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://bruno-guimaraes.com"},
+		AllowedMethods:   []string{"GET", "POST", "OPTIONS"},
+		AllowedHeaders:   []string{"Authorization", "Content-Type"},
+		AllowCredentials: true,
+	})
+
+	http.Handle("/api/send-message", c.Handler(interfaces.AuthMiddleware(authToken, handler.SendMessage)))
+
 	fmt.Println("Server starting on :8080...")
 	http.ListenAndServe(":8080", nil)
 }
