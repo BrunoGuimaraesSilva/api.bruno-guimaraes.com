@@ -1,10 +1,8 @@
 package infrastructure
 
 import (
-	"fmt"
-
 	"github.com/BrunoGuimaraesSilva/api.bruno-guimaraes.com/domain"
-
+	"github.com/BrunoGuimaraesSilva/api.bruno-guimaraes.com/errors"
 	"github.com/resend/resend-go/v2"
 )
 
@@ -19,7 +17,7 @@ func NewResendEmailRepository(apiKey string) *ResendEmailRepository {
 	}
 }
 
-func (r *ResendEmailRepository) Send(email domain.Email) (interface{}, error) {
+func (r *ResendEmailRepository) Send(email domain.Email) (string, error) {
 	params := &resend.SendEmailRequest{
 		From:    email.From,
 		To:      email.To,
@@ -29,7 +27,11 @@ func (r *ResendEmailRepository) Send(email domain.Email) (interface{}, error) {
 
 	response, err := r.Client.Emails.Send(params)
 	if err != nil {
-		return nil, fmt.Errorf("failed to send email: %v", err)
+		return "", errors.FormatError(
+			"Unable to send email at this time, please try again later",
+			err,
+			"Email Service > Send > Resend API",
+		)
 	}
 	return response.Id, nil
 }

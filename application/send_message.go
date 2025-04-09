@@ -12,35 +12,48 @@ func NewSendMessageService(emailRepo domain.EmailRepository) *SendMessageService
 	return &SendMessageService{EmailRepo: emailRepo}
 }
 
-func (s *SendMessageService) SendMessage(senderName, senderEmail, content string) (adminResp, clientResp interface{}, err error) {
-	emailAddr, err := domain.NewEmailAddress(senderEmail)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	msg, err := domain.NewMessage(senderName, emailAddr, content)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	// Prepare and send admin email
+func (s *SendMessageService) SendMessageAdmin(msg domain.Message) (adminResp string, err error) {
 	adminEmail, err := msg.PrepareAdminEmail()
 	if err != nil {
-		return nil, nil, err
-	}
-	adminResp, err = s.EmailRepo.Send(adminEmail)
-	if err != nil {
-		return nil, nil, err
+		return "", err
 	}
 
-	// Prepare and send client email
+	adminResp, err = s.EmailRepo.Send(adminEmail)
+	if err != nil {
+		return "", err
+	}
+
+	return adminResp, nil
+}
+
+func (s *SendMessageService) SendMessageClient(msg domain.Message) (clientResp string, err error) {
 	clientEmail, err := msg.PrepareClientEmail()
 	if err != nil {
-		return nil, nil, err
+		return "", err
 	}
+
 	clientResp, err = s.EmailRepo.Send(clientEmail)
 	if err != nil {
-		return nil, nil, err
+		return "", err
+	}
+
+	return clientResp, nil
+}
+
+func (s *SendMessageService) SendMessage(senderName, senderEmail, content string) (adminResp, clientResp string, err error) {
+	msg, err := domain.NewMessage(senderName, senderEmail, content)
+	if err != nil {
+		return "", "", err
+	}
+
+	adminResp, err = s.SendMessageAdmin(*msg)
+	if err != nil {
+		return "", "", err
+	}
+
+	clientResp, err = s.SendMessageClient(*msg)
+	if err != nil {
+		return "", "", err
 	}
 
 	return adminResp, clientResp, nil

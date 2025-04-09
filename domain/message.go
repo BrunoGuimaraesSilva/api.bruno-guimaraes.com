@@ -2,21 +2,11 @@ package domain
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/BrunoGuimaraesSilva/api.bruno-guimaraes.com/domain/templates"
 )
 
-// EmailAddress is a Value Object
-type EmailAddress string
-
-func NewEmailAddress(value string) (EmailAddress, error) {
-	if value == "" {
-		return "", fmt.Errorf("email address cannot be empty")
-	}
-	return EmailAddress(value), nil
-}
-
-// Message is an Entity and Aggregate Root
 type Message struct {
 	SenderName     string
 	SenderEmail    EmailAddress
@@ -24,22 +14,32 @@ type Message struct {
 	AdminRecipient EmailAddress
 }
 
-func NewMessage(senderName string, senderEmail EmailAddress, content string) (*Message, error) {
+func NewMessage(senderName string, senderEmail string, content string) (*Message, error) {
+	AdminEmail := os.Getenv("ADMIN_EMAIL")
+	if AdminEmail == "" {
+		AdminEmail = "no-reply@bruno-guimaraes.com"
+	}
+
 	if senderName == "" {
 		return nil, fmt.Errorf("sender name cannot be empty")
 	}
 	if content == "" {
-		return nil, fmt.Errorf("content cannot be empty")
+		return nil, fmt.Errorf("message cannot be empty")
 	}
+
+	emailAddr, err := NewEmailAddress(senderEmail)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Message{
 		SenderName:     senderName,
-		SenderEmail:    senderEmail,
+		SenderEmail:    emailAddr,
 		Content:        content,
-		AdminRecipient: EmailAddress("bruno.sil16441@gmail.com"),
+		AdminRecipient: EmailAddress(AdminEmail),
 	}, nil
 }
 
-// PrepareAdminEmail constructs the admin notification using the template
 func (m *Message) PrepareAdminEmail() (Email, error) {
 	html, err := templates.RenderAdminEmail(templates.AdminEmailData{
 		Name:    m.SenderName,
@@ -58,7 +58,6 @@ func (m *Message) PrepareAdminEmail() (Email, error) {
 	}, nil
 }
 
-// PrepareClientEmail constructs the client confirmation using the template
 func (m *Message) PrepareClientEmail() (Email, error) {
 	html, err := templates.RenderClientEmail(templates.ClientEmailData{
 		Name:    m.SenderName,

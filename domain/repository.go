@@ -1,5 +1,5 @@
 package domain
 
 type EmailRepository interface {
-	Send(email Email) (interface{}, error)
+	Send(email Email) (string, error)
 }

@@ -1,8 +1,6 @@
-version: "3.8"
-
 services:
-  email-service:
-    image: email-service:latest
+  api.bruno-guimaraes.com:
+    image: api.bruno-guimaraes.com:latest
     build:
       context: .
       dockerfile: Dockerfile
@@ -11,5 +9,8 @@ services:
     environment:
       - RESEND_API_KEY=${RESEND_API_KEY}
       - AUTH_TOKEN=${AUTH_TOKEN}
+      - EMAIL_ADMIN=${EMAIL_ADMIN}
+      - CORS_ORIGIN=${CORS_ORIGIN}
+      - GO_ENV=${GO_ENV}
     restart: unless-stopped
-    container_name: email-service
+    container_name: api.bruno-guimaraes.com

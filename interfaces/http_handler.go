@@ -15,9 +15,9 @@ type EmailRequest struct {
 }
 
 type EmailResponse struct {
-	AdminEmail  interface{} `json:"adminEmail,omitempty"`
-	ClientEmail interface{} `json:"clientEmail,omitempty"`
-	Message     string      `json:"message,omitempty"`
+	AdminEmail  string `json:"adminEmail,omitempty"`
+	ClientEmail string `json:"clientEmail,omitempty"`
+	Message     string `json:"message,omitempty"`
 }
 
 type MessageHandler struct {
