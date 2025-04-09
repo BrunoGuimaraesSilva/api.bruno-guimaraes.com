@@ -18,6 +18,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Use variables
+        run: |
+          echo "Cors origin variable : $CORS_ORIGIN"
+          echo "Admin email variable : $EMAIL_ADMIN"
+          echo "Go env : $GO_ENV"
+        env:
+          CORS_ORIGIN: ${{ vars.CORS_ORIGIN }}
+          EMAIL_ADMIN: ${{ vars.EMAIL_ADMIN }}
+          GO_ENV: ${{ vars.GO_ENV }}
+
       # Build and tag the Docker image
       - name: Build Docker Image
         run: |
